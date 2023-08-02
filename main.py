@@ -24,7 +24,7 @@ def blackout(ip, port, size, connections, finished_event):
                 finished_event.set()  # Sinaliza o término do ataque
                 return
 
-    print(f"[*] Launching Blackout attack on {ip}:{port} with {connections} connections...")
+    print(f"[*] Iniciando ataque em {ip}:{port} with {connections} connections...")
     time.sleep(2.5)
 
     for sock in socks:
@@ -34,7 +34,7 @@ def blackout(ip, port, size, connections, finished_event):
             print(f"Mandando chumbo em {ip}:{port}")
         except socket.error as e:
             errors += 1
-            print(f"[-] Erro, se tá tudo certo {ip}:{port}: {e}")
+            print(f"[-] Erro, vê se tá tudo certo {ip}:{port}: {e}")
 
     for sock in socks:
         sock.close()
@@ -55,13 +55,14 @@ def get_ip_or_domain(ip_or_domain):
 
 def main():
     print('''
-
-    8P d8P 888'Y88 888 88e
+    
+  8P d8P 888'Y88 888 88e
  P d8P  888 ,'Y 888 888b
   d8P d 888C8   888 8888D
  d8P d8 888 ",d 888 888P
-d8P d88 888,d88 888 88''')
-
+d8P d88 888,d88 888 88
+"''')
+    
     example_url = "Exemplo: www.example.com ou 93.184.216.34"
 
     ip_or_domain = questionary.text(f"Enter the target IP address or domain ({example_url}):").ask()
