@@ -79,5 +79,6 @@ d8P d88 888,d88 888 88
     print(colorama.Fore.YELLOW + "Créditos para o Zed Hacking, kiba não puta")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
     
