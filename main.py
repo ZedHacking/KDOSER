@@ -1,7 +1,6 @@
 import socket
 import hashlib
 import asyncio
-import questionary
 import validators
 import colorama
 
@@ -59,19 +58,19 @@ d8P d88 888,d88 888 88
     
     example_url = "Exemplo: www.example.com ou 93.184.216.34"
 
-    ip_or_domain = questionary.text(colorama.Fore.CYAN + f"Enter the target IP address or domain ({example_url}):").ask()
+    ip_or_domain = input(colorama.Fore.CYAN + f"Enter the target IP address or domain ({example_url}): ")
     ip = get_ip_or_domain(ip_or_domain)
 
-    port = questionary.text(colorama.Fore.CYAN + "Enter the target port (default: 80):").ask()
+    port = input(colorama.Fore.CYAN + "Enter the target port (default: 80): ")
     port = int(port) if port else 80
 
-    size = questionary.text(colorama.Fore.CYAN + "Enter the packet size (default: 1024):").ask()
+    size = input(colorama.Fore.CYAN + "Enter the packet size (default: 1024): ")
     size = int(size) if size else 1024
 
-    connections = questionary.text(colorama.Fore.CYAN + "Enter the number of connections (default: 1000):").ask()
+    connections = input(colorama.Fore.CYAN + "Enter the number of connections (default: 1000): ")
     connections = int(connections) if connections else 1000
 
-    attack_duration = questionary.text(colorama.Fore.CYAN + "Enter the attack duration in seconds (default: 60):").ask()
+    attack_duration = input(colorama.Fore.CYAN + "Enter the attack duration in seconds (default: 60): ")
     attack_duration = int(attack_duration) if attack_duration else 60
 
     await asyncio.gather(*[blackout(ip, port, size, connections, attack_duration) for _ in range(10)])
